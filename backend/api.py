@@ -15,7 +15,7 @@ jumiaURLSuffix = "&sort=lowest-price#catalog-listing"
 
 
 @app.get("/{article}")
-def home(article:str):
+def home(article:str,narticles:int=5):
     #Fixing the article string
     article = article.strip()
     article = article.replace(" ", "+")
@@ -36,18 +36,18 @@ def home(article:str):
     jumia = BeautifulSoup(jumia,"html.parser")
     
     try:
-        photosMytek = mytek.find_all("img",class_="product-image-photo",limit=5)
+        photosMytek = mytek.find_all("img",class_="product-image-photo",limit=narticles)
     
         photosMytek = [str(aa['src']) for aa in photosMytek]
-        titleMytek = mytek.find_all("a",class_="product-item-link",limit=5)
+        titleMytek = mytek.find_all("a",class_="product-item-link",limit=narticles)
         linkMytek = [str(aa['href']) for aa in titleMytek]
         titleMytek = [str(aa.contents[0]) for aa in titleMytek]
-        pricesMytek = mytek.find_all("span",id=re.compile("^[p][r][o][d][u][c][t][\-][p][r][i][c][e][\-].*$"),limit=5)
+        pricesMytek = mytek.find_all("span",id=re.compile("^[p][r][o][d][u][c][t][\-][p][r][i][c][e][\-].*$"),limit=narticles)
         pricesMytek = [str(aa.contents[0].contents[0]) for aa in pricesMytek]
     
 
         resultMytek = {}
-        for i in range(5):
+        for i in range(narticles):
             resultMytek[i] = {
                     "photo":photosMytek[i],
                     "title":titleMytek[i],
