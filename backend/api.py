@@ -1,9 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from bs4 import BeautifulSoup
 import re
 import requests
 
 app = FastAPI()
+
+origins = ['*']
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 mytekURL = "https://www.mytek.tn/catalogsearch/result/index/?q="
 tunisianetURL = "https://www.tunisianet.com.tn/recherche?controller=search&orderby=price&orderway=asc&s="
@@ -30,7 +41,7 @@ def home(article:str,narticles:int=5):
     tunisanet = tunisanet.text
     jumia = jumia.text
 
-    #Giving them to beutifulSoup
+    #Giving them to beautifulSoup
     mytek = BeautifulSoup(mytek,"html.parser")
     tunisanet = BeautifulSoup(tunisanet,"html.parser")
     jumia = BeautifulSoup(jumia,"html.parser")
@@ -53,6 +64,7 @@ def home(article:str,narticles:int=5):
 
     except Exception:
         pricesMytek,titleMytek,linkMytek,photosMytek = [],[],[],[]
+        
 
     try:
         photosTunisiaNet = tunisanet.find_all("img",width="250",height="250",limit=narticles)
@@ -168,15 +180,15 @@ def home(article:str,narticles:int=5):
         finalLinks.append(linksJumia[j])
         j+=1
 
-    finalResult = {}
+    finalResult = []
 
     for i in range(len(finalTitles)):
-        finalResult[i] = {
+        finalResult.append({
             "photo":finalPhotos[i],
             "link":finalLinks[i],
             "title":finalTitles[i],
             "price":finalPrices[i]
-        }
+        })
 
     return finalResult
 
